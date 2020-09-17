@@ -1,6 +1,10 @@
 const categoryModel = require('../models/category')
 const response = require('../helpers/response')
 
+const redis = require('redis')
+
+const redisClient = redis.createClient()
+
 const category = {
     getAll: (req,res) =>{
         try {
@@ -13,6 +17,7 @@ const category = {
             categoryModel.getAll(name,by,typesort,limit,offset)
 
             .then((result)=>{
+                redisClient.set('category',JSON.stringify(result)) 
                 const totalRows=result[0].count
                 const meta = {
                     totalRows:totalRows,
@@ -47,6 +52,7 @@ const category = {
             const body = req.body
             categoryModel.insert(body)
             .then((result)=>{
+                redisClient.del('category')
                 response.success(res,result, `Insert Category Success`)
             })
             .catch((err)=>{
@@ -62,6 +68,7 @@ const category = {
             const body = req.body
             categoryModel.update(body,id)
             .then((result)=>{
+                redisClient.del('category')
                 response.success(res,result,`Update Category Success`)
             })
             .catch((err)=>{
@@ -77,6 +84,7 @@ const category = {
             const data = req.body
             categoryModel.updatePatch(data,id)
             .then((result)=>{
+                redisClient.del('category')
                 response.success(res,result,`Update Category Success`)
             })
             .catch((err)=>{
@@ -91,6 +99,7 @@ const category = {
             const id = req.params.idcategory
             categoryModel.delete(id)
             .then((result)=>{
+                redisClient.del('category')
                 response.success(res,result,`Delete Category Success`)
             })
             .catch((err)=>{
