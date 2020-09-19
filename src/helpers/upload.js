@@ -1,5 +1,4 @@
 const multer = require('multer')
-// const path = require('path')
 
 const storage = multer.diskStorage({
     destination:(req,file,cb)=>{
@@ -12,7 +11,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage ,
-  limits: {fileSize: 512000}, // 500mb
+  limits: {fileSize: 102400}, // 500kb
   fileFilter(req,file,callback){
       if(file.originalname.match(/\.(jpg|jpeg|png)\b/)){
           callback(null, true)

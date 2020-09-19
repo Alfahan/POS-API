@@ -81,7 +81,7 @@ const product = {
             upload.single('img')(req,res, (err)=>{
                 if(err){
                     if(err.code === 'LIMIT_FILE_SIZE'){
-                        response.failed(res,[], 'Ukuran file terlalu besar')
+                        response.failed(res,[], 'file size is too large')
                     }else{
                         response.failed(res,[], err)
                     }
@@ -108,7 +108,7 @@ const product = {
             upload.single('img')(req,res,(err)=>{
                 if(err){
                     if(err.code === 'LIMIT_FILE_SIZE'){
-                        response.failed(res,[], 'Ukuran file terlalu besar')
+                        response.failed(res,[], 'file size is too large')
                     }else{
                         response.failed(res,[], err)
                     }

@@ -1,6 +1,6 @@
 const express = require('express')
 const usersController = require('../controllers/users')
-
+const auth = require('../helpers/auth')
 const router = express.Router()
 
 router
@@ -9,18 +9,18 @@ router
    // Login
    .post('/login',usersController.login)
    // Refresh 
-   .post('/refreshToken',usersController.renewToken)
+   .post('/refreshToken',auth.authentication, auth.authorization,usersController.renewToken)
    //Logout
-   .post('/logout',usersController.logout)
+   .post('/logout/:iduser',auth.authentication, auth.authorization,usersController.logout)
 
 
    // Get All User
-   .get('/getall',usersController.getall)
+   .get('/getall',auth.authentication, auth.authorization,usersController.getall)
    // Get Detail User
-   .get('/getdetail/:iduser',usersController.getDetail)
+   .get('/getdetail/:iduser',auth.authentication, auth.authorization,usersController.getDetail)
    // Update All User
-   .put('/update/:iduser',usersController.update)
+   .put('/update/:iduser',auth.authentication, auth.authorization,usersController.update)
    // Delete User
-   .delete('/delete/:iduser',usersController.delete)
+   .delete('/delete/:iduser',auth.authentication, auth.authorization, auth.authorizationAdmin, usersController.delete)
 
 module.exports = router

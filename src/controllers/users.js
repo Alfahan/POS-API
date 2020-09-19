@@ -4,7 +4,6 @@ const bcrypt = require('bcrypt')
 const { success, failed, tokenResult } = require('../helpers/response')
 const environment = require('../helpers/env')
 const jwt = require('jsonwebtoken')
-const { reject } = require('lodash')
 
 const users = {
     register:async(req, res) => {
@@ -24,7 +23,7 @@ const users = {
 
             usersModel.register(data)
             .then((result)=>{
-                response.success(res,result, `Insert Users Success`)
+                // response.success(res,result, `Insert Users Success`)
             })
             .catch((err)=>{
                 response.failed(res,[], err.message)
@@ -45,7 +44,8 @@ const users = {
                 if (isMatch){
                     jwt.sign(
                         {
-                            email: results.email
+                            email: results.email,
+                            level: results.level
                         },
                         environment.JWTSecreet,
                         {expiresIn:3600},
@@ -94,7 +94,10 @@ const users = {
             if(result.length >=1){
                 const user = result[0];
                 const newToken = jwt.sign(
-                    {email: user.email},
+                    {
+                        email: user.email,
+                        level: user.level
+                    },
                     environment.JWTSecreet,
                     {expiresIn: 3600}
                 )
@@ -112,9 +115,17 @@ const users = {
     },
     logout:(req,res)=>{
         try {
-            
+            const destroy = req.params.iduser
+            // console.log(destroy)
+            usersModel.logout(destroy)
+            .then((result)=>{
+                response.success(res,result, `Logout Success`)
+            })
+            .catch((err)=>{
+                response.failed(res,[], err.message)
+            })
         } catch (error) {
-            
+            response.failed(res,[], `Internal Server Error`)
         }
     },
     getall:(req,res) =>{

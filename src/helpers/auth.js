@@ -22,6 +22,22 @@ const auth = {
                 next()
             }
         })
+    },
+    authorizationAdmin: (req,res,next) =>{
+        const token = req.headers.token 
+        jwt.verify(token,environment.JWTSecreet, (err,decoded)=>{
+            if(err && err.name === 'TokenExpiredError'){
+                response.tokenResult(res,[], 'Authorization Failed, Token Expired')
+            }else if(err && err.name === 'JsonWebTokenError'){
+                response.tokenResult(res, [], 'Authorization Failed, Token is Wrong')
+            }else{
+                if(decoded.level === 0){
+                    response.tokenResult(res, [], 'Authorization Failed, This is admin access')
+                }else{
+                    next()
+                }
+            }
+        })
     }
 }
 
