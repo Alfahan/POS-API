@@ -13,6 +13,9 @@ router
    //Logout
    .post('/logout/:iduser',auth.authentication, auth.authorization,usersController.logout)
 
+   // Verify
+   .get('/verify/:token',usersController.verify)
+
 
    // Get All User
    .get('/getall',auth.authentication, auth.authorization,usersController.getall)

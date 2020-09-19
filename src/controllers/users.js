@@ -1,11 +1,13 @@
 const usersModel = require('../models/users')
 const response = require('../helpers/response')
 const bcrypt = require('bcrypt')
-const { success, failed, tokenResult } = require('../helpers/response')
 const environment = require('../helpers/env')
 const jwt = require('jsonwebtoken')
+const mailer = require('nodemailer')
+
 
 const users = {
+    // Register
     register:async(req, res) => {
         try {
             const body = req.body
@@ -16,14 +18,50 @@ const users = {
                 email: body.email,
                 nameuser: body.nameuser,
                 password: newhashPassword,
-                status: body.status,
-                level: body.level,
-                refreshToken: body.refreshToken
+                status: 0,
+                level: 0,
+                refreshToken: null
             }
 
             usersModel.register(data)
-            .then((result)=>{
-                // response.success(res,result, `Insert Users Success`)
+            .then(()=>{
+                // Email
+                const newhashPassword = jwt.sign({
+                    email: data.email
+                }, environment.JWTSecreet)
+
+                let transporter = mailer.createTransport({
+                    host: 'smtp.gmail.com',
+                    port: 587,
+                    secure: false,
+                    requireTLS: true,
+                    auth:{
+                        user: environment.email,
+                        pass: environment.passwordd
+                    }
+                })
+
+                let mailOptions = {
+                    from: 'O.O' + environment.email,
+                    to: data.email,
+                    subject: `Hello ${data.email}`,
+                    html:
+                    `Please Activation of Email ! <br>
+                    <a href="${environment.url}users/verify/${newhashPassword}">Aktivasi</a>`
+                }
+
+                transporter.sendMail(mailOptions,(err, result) =>{
+                    if(err){
+                        res.status(505)
+                        response.failed(res,[], err.message)
+                    } else {
+                        response.success(res, [result], 'Send Mail Success')
+                    }
+                })
+
+                res.json({
+                    message: `Success resgistration, Please Activation of Email!`
+                })
             })
             .catch((err)=>{
                 response.failed(res,[], err.message)
@@ -32,6 +70,7 @@ const users = {
             response.failed(res,[], `Internal Server Error`)
         }
     },
+    // Login
     login:async(req,res) => {
         try {
             const body = req.body
@@ -62,7 +101,7 @@ const users = {
                                             token:token,
                                             refreshToken: refreshToken
                                         }
-                                        tokenResult(res, data, 'Login Success')
+                                        response.tokenResult(res, data, 'Login Success')
                                     })                    
                                     .catch((err)=>{
                                         response.failed(res,[], err.message)
@@ -72,13 +111,13 @@ const users = {
                                         token:token,
                                         refreshToken: userRefreshToken
                                     }
-                                    tokenResult(res, data, 'Login Success')
+                                    response.tokenResult(res, data, 'Login Success')
                                 }
                             }
                         }
                     )
                 }else{
-                    failed(res,[],'Login Failed')
+                    response.failed(res,[],'Login Failed')
                 }
             })
             .catch((err)=>{
@@ -88,6 +127,7 @@ const users = {
             response.failed(res,[], `Internal Server Error`)
         }
     },
+    // RenewToken
     renewToken:(req,res)=>{
         const refreshToken = req.body.refreshToken
         usersModel.checkRefreshToken(refreshToken).then((result)=>{
@@ -105,14 +145,15 @@ const users = {
                     token: newToken,
                     refreshToken: refreshToken
                 }
-                tokenResult(res,data,'The token has been refreshed successfully ')
+                response.tokenResult(res,data,'The token has been refreshed successfully ')
             }else{
-                failed(res,[], 'Refresh token not found')
+                response.failed(res,[], 'Refresh token not found')
             }
         }).catch((err)=>{
             response.failed(res,[], err.message)
         })
     },
+    // Logout
     logout:(req,res)=>{
         try {
             const destroy = req.params.iduser
@@ -193,6 +234,32 @@ const users = {
             })
         } catch (error) {
             response.failed(res, [], 'Internal Server Error')
+        }
+    },
+    verify:(req,res) =>{
+        const token = req.params.token
+        if(token) {
+            jwt.verify(token, environment.JWTSecreet,(err,decode) =>{
+                if(err){
+                    res.status(505)
+                    response.failed(res, [], `Failed Activation`)
+                }else{
+                    const email = decode.email
+                    usersModel.getUsers(email)
+                    .then((result)=>{
+                        if(result.affectedRows){
+                            res.status(200)
+                            response.success(res, { email }, `Congratulation, Your account has been created!`)
+                        }
+                        res.status(505)
+                        response.failed(res, [], `Failed activation`)
+                    })
+                    .catch((err)=>{
+                        res.status(505)
+                        response.failed(res, [], err.message)
+                    })
+                }
+            })
         }
     }
 }

@@ -1,4 +1,5 @@
 const db = require('../configs/db')
+const { reject } = require('lodash')
 
     const users = {
         register:(data) =>{
@@ -66,6 +67,19 @@ const db = require('../configs/db')
                     }
                 })
             }) 
+        },
+        getUsers:(data) =>{
+            return new Promise((resolve,reject)=>{
+                db.query(`UPDATE users SET status=1 WHERE email='${data}'`,(err,result)=>{
+                    (err,sukses) =>{
+                        if(err){
+                            reject(new Error(err))
+                        }else{
+                            resolve(result)
+                        }
+                    }
+                })
+            })
         },
         getDetail:(id) =>{
             return new Promise((resolve, reject)=>{
