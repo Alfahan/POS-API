@@ -71,12 +71,10 @@ const { reject } = require('lodash')
         getUsers:(data) =>{
             return new Promise((resolve,reject)=>{
                 db.query(`UPDATE users SET status=1 WHERE email='${data}'`,(err,result)=>{
-                    (err,sukses) =>{
-                        if(err){
-                            reject(new Error(err))
-                        }else{
-                            resolve(result)
-                        }
+                    if(err){
+                        reject(new Error(err))
+                    }else{
+                        resolve(result)
                     }
                 })
             })

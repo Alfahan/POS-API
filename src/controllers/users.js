@@ -44,10 +44,11 @@ const users = {
                 let mailOptions = {
                     from: 'O.O' + environment.email,
                     to: data.email,
-                    subject: `Hello ${data.email}`,
+                    subject: `Hello ${data.email} `,
                     html:
                     `Please Activation of Email ! <br>
-                    <a href="${environment.url}users/verify/${newhashPassword}">Aktivasi</a>`
+                    Klik -->
+                    <a href="${environment.url}users/verify/${newhashPassword}">Aktivasi</a><--`
                 }
 
                 transporter.sendMail(mailOptions,(err, result) =>{
@@ -157,7 +158,6 @@ const users = {
     logout:(req,res)=>{
         try {
             const destroy = req.params.iduser
-            // console.log(destroy)
             usersModel.logout(destroy)
             .then((result)=>{
                 response.success(res,result, `Logout Success`)
@@ -250,9 +250,10 @@ const users = {
                         if(result.affectedRows){
                             res.status(200)
                             response.success(res, { email }, `Congratulation, Your account has been created!`)
+                        }else{
+                            res.status(505)
+                            response.failed(res, [], `Failed activation`)
                         }
-                        res.status(505)
-                        response.failed(res, [], `Failed activation`)
                     })
                     .catch((err)=>{
                         res.status(505)
