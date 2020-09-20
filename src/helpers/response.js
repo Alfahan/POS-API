@@ -44,7 +44,7 @@ const response = {
             data:data,
         }
         res.json(result)
-    },
+    }
     
 }
 

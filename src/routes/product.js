@@ -10,10 +10,10 @@ const router = express.Router()
 router
 .get('/getall', redis.getProduct , productController.getAll)
 .get('/getdetail/:idproduct', productController.getDetail)
-.post('/insert',auth.authentication,auth.authorization,  productController.insert)
-.put('/update/:idproduct',auth.authentication,auth.authorization,productController.update)
-.patch('/updatePatch/:idproduct',auth.authentication,auth.authorization,productController.updatePatch)
-.delete('/delete/:idproduct',auth.authentication,auth.authorization, productController.delete)
+.post('/insert',auth.authentication,auth.authorization, auth.authorizationAdmin,  productController.insert)
+.put('/update/:idproduct',auth.authentication,auth.authorization, auth.authorizationAdmin,productController.update)
+.patch('/updatePatch/:idproduct',auth.authentication,auth.authorization, auth.authorizationAdmin, productController.updatePatch)
+.delete('/delete/:idproduct',auth.authentication,auth.authorization, auth.authorizationAdmin, productController.delete)
 
 
 module.exports = router

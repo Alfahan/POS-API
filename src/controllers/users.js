@@ -48,7 +48,7 @@ const users = {
                     html:
                     `Please Activation of Email ! <br>
                     Klik -->
-                    <a href="${environment.url}users/verify/${newhashPassword}">Aktivasi</a><--`
+                    <a href="${environment.url}users/verify/${newhashPassword}">Aktivasi</a> <--`
                 }
 
                 transporter.sendMail(mailOptions,(err, result) =>{
