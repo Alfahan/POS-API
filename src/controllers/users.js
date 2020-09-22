@@ -88,7 +88,7 @@ const users = {
                             level: results.level
                         },
                         environment.JWTSecreet,
-                        {expiresIn:20},
+                        {expiresIn:3600},
                         (err,token) => {
                             if(err){
                                 console.log(err)

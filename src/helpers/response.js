@@ -31,10 +31,19 @@ const response = {
         const result = {
             message:message,
             success:true,
+            code:405,
+            data:[]
+        }
+        res.status(405).json(result)
+    },
+    tokenErr: (res,data,message) =>{
+        const result = {
+            message:message,
+            success:true,
             code:500,
             data:[]
         }
-        res.json(result)
+        res.status(500).json(result)
     },
     tokenResult: (res,data,message) =>{
         const result = {

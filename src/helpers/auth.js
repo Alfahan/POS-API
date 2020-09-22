@@ -17,7 +17,7 @@ const auth = {
             if(err && err.name === 'TokenExpiredError'){
                 response.tokenExpired(res,[], 'Authorization Failed, Token Expired')
             }else if(err && err.name === 'JsonWebTokenError'){
-                response.tokenResult(res, [], 'Authorization Failed, Token is Wrong')
+                response.tokenErr(res, [], 'Authorization Failed, Token is Wrong')
             }else{
                 next()
             }
@@ -32,7 +32,7 @@ const auth = {
                 response.tokenResult(res, [], 'Authorization Failed, Token is Wrong')
             }else{
                 if(decoded.level === 0){
-                    response.tokenResult(res, [], 'Authorization Failed, This is admin access')
+                    response.tokenErr(res, [], 'Authorization Failed, This is admin access')
                 }else{
                     next()
                 }
