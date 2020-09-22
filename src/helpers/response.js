@@ -31,8 +31,8 @@ const response = {
         const result = {
             message:message,
             success:true,
-            code,
-            data
+            code:500,
+            data:[]
         }
         res.json(result)
     },

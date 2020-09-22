@@ -15,7 +15,7 @@ const auth = {
         const token = req.headers.token
         jwt.verify(token,environment.JWTSecreet, (err,decoded) => {
             if(err && err.name === 'TokenExpiredError'){
-                response.tokenResult(res,[], 'Authorization Failed, Token Expired')
+                response.tokenExpired(res,[], 'Authorization Failed, Token Expired')
             }else if(err && err.name === 'JsonWebTokenError'){
                 response.tokenResult(res, [], 'Authorization Failed, Token is Wrong')
             }else{
@@ -27,7 +27,7 @@ const auth = {
         const token = req.headers.token 
         jwt.verify(token,environment.JWTSecreet, (err,decoded)=>{
             if(err && err.name === 'TokenExpiredError'){
-                response.tokenResult(res,[], 'Authorization Failed, Token Expired')
+                response.tokenExpired(res,[], 'Authorization Failed, Token Expired')
             }else if(err && err.name === 'JsonWebTokenError'){
                 response.tokenResult(res, [], 'Authorization Failed, Token is Wrong')
             }else{
