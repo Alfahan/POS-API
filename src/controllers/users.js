@@ -1,9 +1,10 @@
 const usersModel = require('../models/users')
 const response = require('../helpers/response')
 const bcrypt = require('bcrypt')
-const environment = require('../helpers/env')
+const { JWTSecreet, emaill, passwordd, url } = require('../helpers/env')
 const jwt = require('jsonwebtoken')
 const mailer = require('nodemailer')
+const { failed } = require('../helpers/response')
 
 
 const users = {
@@ -27,8 +28,9 @@ const users = {
             .then(()=>{
                 // Email
                 const newhashPassword = jwt.sign({
-                    email: data.email
-                }, environment.JWTSecreet)
+                    email: data.email,
+                    nameuser: data.nameuser
+                }, JWTSecreet)
 
                 let transporter = mailer.createTransport({
                     host: 'smtp.gmail.com',
@@ -36,19 +38,20 @@ const users = {
                     secure: false,
                     requireTLS: true,
                     auth:{
-                        user: environment.email,
-                        pass: environment.passwordd
+                        user: emaill,
+                        pass: passwordd
                     }
                 })
 
                 let mailOptions = {
-                    from: 'O.O' + environment.email,
-                    to: data.email,
-                    subject: `Hello ${data.email} `,
-                    html:
-                    `Please Activation of Email ! <br>
+                    from    : 'MAKAN ENAK' + emaill,
+                    to      : data.email,
+                    subject : `Hello ${data.email} `,
+                    html    :
+                    ` Hai <h1><b>${data.nameuser}</b></h1>
+                    Please Activation of Email ! <br>
                     Klik -->
-                    <a href="${environment.url}users/verify/${newhashPassword}">Aktivasi</a> <--`
+                    <a href="${url}users/verify/${newhashPassword}">Aktivasi</a> <--`
                 }
 
                 transporter.sendMail(mailOptions,(err, result) =>{
@@ -71,6 +74,33 @@ const users = {
             response.failed(res,[], `Internal Server Error`)
         }
     },
+    verify:(req,res) =>{
+        const token = req.params.token
+        if(token) {
+            jwt.verify(token, JWTSecreet,(err,decode) =>{
+                if(err){
+                    res.status(505)
+                    response.failed(res, [], `Failed Activation`)
+                }else{
+                    const email = decode.email
+                    usersModel.getUsers(email)
+                    .then((result)=>{
+                        if(result.affectedRows){
+                            res.status(200)
+                            res.render('index', {email})
+                        }else{
+                            res.status(505)
+                            response.failed(res, [], `Failed activation`)
+                        }
+                    })
+                    .catch((err)=>{
+                        res.status(505)
+                        response.failed(res, [], err.message)
+                    })
+                }
+            })
+        }
+    },
     // Login
     login:async(req,res) => {
         try {
@@ -78,45 +108,56 @@ const users = {
             usersModel.login(body)
             .then(async(result)=>{
                 const results = result[0]
+                console.log(results)
                 const password = results.password
                 const userRefreshToken = results.refreshToken
                 const isMatch = await bcrypt.compare( body.password, password)
+
+
                 if (isMatch){
-                    jwt.sign(
-                        {
-                            email: results.email,
-                            level: results.level
-                        },
-                        environment.JWTSecreet,
-                        {expiresIn:3600},
-                        (err,token) => {
-                            if(err){
-                                console.log(err)
-                            }else{
-                                if(userRefreshToken === null){
-                                    const id = results.iduser
-                                    const refreshToken = jwt.sign({ id }, 'Refresh Token123456')
-                                    usersModel.updateRefreshToken(refreshToken,id)
-                                    .then(()=>{
+                    if(results.status === 1){
+                        jwt.sign(
+                            {
+                                email: results.email,
+                                level: results.level
+                            },
+                            JWTSecreet,
+                            {expiresIn:120},
+                            (err,token) => {
+                                if(err){
+                                    console.log(err)
+                                }else{
+                                    if(userRefreshToken === null){
+                                        const id = results.iduser
+                                        const refreshToken = jwt.sign({ id }, JWTSecreet)
+                                        usersModel.updateRefreshToken(refreshToken,id)
+                                        .then(()=>{
+                                            const data = {
+                                                iduser  : id,
+                                                level   : results.level,
+                                                token   :token,
+                                                refreshToken   : refreshToken
+                                            }
+                                            response.tokenResult(res, data, 'Login Success')
+                                        })                    
+                                        .catch((err)=>{
+                                            response.failed(res,[], err.message)
+                                        })
+                                    }else{
                                         const data = {
-                                            token:token,
-                                            refreshToken: refreshToken
+                                            iduser  : results.iduser,
+                                            level   : results.level,
+                                            token   : token,
+                                            refreshToken   : userRefreshToken
                                         }
                                         response.tokenResult(res, data, 'Login Success')
-                                    })                    
-                                    .catch((err)=>{
-                                        response.failed(res,[], err.message)
-                                    })
-                                }else{
-                                    const data = {
-                                        token:token,
-                                        refreshToken: userRefreshToken
                                     }
-                                    response.tokenResult(res, data, 'Login Success')
                                 }
                             }
-                        }
-                    )
+                        )
+                    } else {
+                        failed(res, [], 'Need Activation')
+                    }
                 }else{
                     response.failed(res,[],'Login Failed')
                 }
@@ -137,9 +178,10 @@ const users = {
                 const newToken = jwt.sign(
                     {
                         email: user.email,
+                        nameuser: user.nameuser,
                         level: user.level
                     },
-                    environment.JWTSecreet,
+                    JWTSecreet,
                     {expiresIn: 3600}
                 )
                 const data = {
@@ -236,33 +278,7 @@ const users = {
             response.failed(res, [], 'Internal Server Error')
         }
     },
-    verify:(req,res) =>{
-        const token = req.params.token
-        if(token) {
-            jwt.verify(token, environment.JWTSecreet,(err,decode) =>{
-                if(err){
-                    res.status(505)
-                    response.failed(res, [], `Failed Activation`)
-                }else{
-                    const email = decode.email
-                    usersModel.getUsers(email)
-                    .then((result)=>{
-                        if(result.affectedRows){
-                            res.status(200)
-                            response.success(res, { email }, `Congratulation, Your account has been created!`)
-                        }else{
-                            res.status(505)
-                            response.failed(res, [], `Failed activation`)
-                        }
-                    })
-                    .catch((err)=>{
-                        res.status(505)
-                        response.failed(res, [], err.message)
-                    })
-                }
-            })
-        }
-    }
+ 
 }
 
 module.exports = users

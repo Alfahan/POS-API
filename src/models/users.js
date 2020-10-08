@@ -1,5 +1,4 @@
 const db = require('../configs/db')
-const { reject } = require('lodash')
 
     const users = {
         register:(data) =>{
