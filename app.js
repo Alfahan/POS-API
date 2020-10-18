@@ -20,11 +20,11 @@ app.use(bodyParser.json())
 
 app.use(express.static('./src/uploads/'))
 
+app.use(cors())
 app.use('/users',usersRouter)
 app.use('/product',productRouter)
 app.use('/category',categoryRouter)
 app.use('/history',historyRouter)
-app.use(cors())
 
 app.listen(env.PORT,()=>{
     console.log(`Server running on port ${env.PORT}`)

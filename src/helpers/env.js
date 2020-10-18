@@ -9,7 +9,8 @@ const environment = {
     JWTSecreet  : process.env.JWTSecreet,
     emaill      : process.env.EMAIL,
     passwordd   : process.env.PASSWORD,
-    url         : process.env.URL
+    url         : process.env.URL,
+    urlforgot   : process.env.URLFORGOT
 }
 
 

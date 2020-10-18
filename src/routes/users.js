@@ -11,10 +11,10 @@ router
    .post('/login',usersController.login)
    
    // Refresh 
-   .post('/refreshToken',auth.authentication, auth.authorization,usersController.renewToken)
+   .post('/refreshToken', usersController.renewToken)
    
    //Logout
-   .post('/logout/:iduser',auth.authentication, auth.authorization,usersController.logout)
+   .post('/logout/:iduser',usersController.logout)
 
    // Verify
    .get('/verify/:token',usersController.verify)

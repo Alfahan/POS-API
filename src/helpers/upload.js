@@ -16,7 +16,7 @@ const upload = multer({
       if(file.originalname.match(/\.(jpg|jpeg|png)\b/)){
           callback(null, true)
       }else{
-          callback('Image type must jpg,jpeg,png', null)
+          callback('Image type must JPG ,JPEG, PNG', null)
       }
   }
 })

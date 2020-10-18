@@ -40,7 +40,7 @@ const response = {
         const result = {
             message:message,
             success:false,
-            code:500,
+            code:505,
             data:[]
         }
         res.status(500).json(result)

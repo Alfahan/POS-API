@@ -20,13 +20,12 @@ const users = {
                 nameuser: body.nameuser,
                 password: newhashPassword,
                 status: 0,
-                level: 0,
+                level: 1,
                 refreshToken: null
             }
 
             usersModel.register(data)
             .then(()=>{
-                // Email
                 const newhashPassword = jwt.sign({
                     email: data.email,
                     nameuser: data.nameuser
@@ -49,9 +48,9 @@ const users = {
                     subject : `Hello ${data.email} `,
                     html    :
                     ` Hai <h1><b>${data.nameuser}</b></h1>
-                    Please Activation of Email ! <br>
+                    PLEASE ACTIVATE YOUR EMAIL ! <br>
                     Klik -->
-                    <a href="${url}users/verify/${newhashPassword}">Aktivasi</a> <--`
+                    <a href="${url}users/verify/${newhashPassword}">Activation</a> <--`
                 }
 
                 transporter.sendMail(mailOptions,(err, result) =>{
@@ -64,7 +63,7 @@ const users = {
                 })
 
                 res.json({
-                    message: `Success resgistration, Please Activation of Email!`
+                    message: `Success Resgistration, Please Activation your Email!`
                 })
             })
             .catch((err)=>{
@@ -90,7 +89,7 @@ const users = {
                             res.render('index', {email})
                         }else{
                             res.status(505)
-                            response.failed(res, [], `Failed activation`)
+                            response.failed(res, [], err.message)
                         }
                     })
                     .catch((err)=>{
@@ -106,9 +105,9 @@ const users = {
         try {
             const body = req.body
             usersModel.login(body)
+
             .then(async(result)=>{
                 const results = result[0]
-                console.log(results)
                 const password = results.password
                 const userRefreshToken = results.refreshToken
                 const isMatch = await bcrypt.compare( body.password, password)
@@ -119,10 +118,12 @@ const users = {
                         jwt.sign(
                             {
                                 email: results.email,
+                                nameuser: results.nameuser,
                                 level: results.level
                             },
                             JWTSecreet,
-                            {expiresIn:120},
+                            {expiresIn:5},
+
                             (err,token) => {
                                 if(err){
                                     console.log(err)
@@ -134,6 +135,7 @@ const users = {
                                         .then(()=>{
                                             const data = {
                                                 iduser  : id,
+                                                nameuser: results.nameuser,
                                                 level   : results.level,
                                                 token   :token,
                                                 refreshToken   : refreshToken
@@ -146,6 +148,7 @@ const users = {
                                     }else{
                                         const data = {
                                             iduser  : results.iduser,
+                                            nameuser: results.nameuser,
                                             level   : results.level,
                                             token   : token,
                                             refreshToken   : userRefreshToken
@@ -159,7 +162,7 @@ const users = {
                         failed(res, [], 'Need Activation')
                     }
                 }else{
-                    response.failed(res,[],'Login Failed')
+                    response.failed(res,[],'Incorrect password! please try again')
                 }
             })
             .catch((err)=>{
@@ -172,7 +175,8 @@ const users = {
     // RenewToken
     renewToken:(req,res)=>{
         const refreshToken = req.body.refreshToken
-        usersModel.checkRefreshToken(refreshToken).then((result)=>{
+        usersModel.checkRefreshToken(refreshToken)
+        .then((result)=>{
             if(result.length >=1){
                 const user = result[0];
                 const newToken = jwt.sign(
