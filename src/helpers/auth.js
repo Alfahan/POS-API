@@ -31,11 +31,7 @@ const auth = {
             }else if(err && err.name === 'JsonWebTokenError'){
                 response.tokenResult(res, [], 'Authorization Failed, Token is Wrong')
             }else{
-                if(decoded.level === 0){
-                    response.tokenErr(res, [], 'Authorization Failed, Token Expired')
-                }else{
-                    next()
-                }
+                next()
             }
         })
     }

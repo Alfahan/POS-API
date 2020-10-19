@@ -54,23 +54,24 @@ const product = {
     insert:(req,res) => {
         try {
             upload.single('img')(req,res, (err)=> {
-                if(err){
+                if (err){
                     if(err.code === 'LIMIT_FILE_SIZE'){
-                        response.failed(res,[], 'file size is too large')
+                        response.failed(res,[], 'Image size is too big! Please upload another one with size <200kb')
                     }else{
                         response.failed(res,[], err)
                     }
+                } else {
+                    const body = req.body
+                    body.img = req.file.filename
+                    productModel.insert(body)
+                    .then((result)=>{
+                        redisClient.del('product')
+                        response.success(res,result, `Insert Product Success`)
+                    })
+                    .catch((err)=>{
+                        response.failed(res,[], err.message)
+                    })
                 }
-                const body = req.body
-                body.img = req.file.filename
-                productModel.insert(body)
-                .then((result)=>{
-                    redisClient.del('product')
-                    response.success(res,result, `Insert Product Success`)
-                })
-                .catch((err)=>{
-                    response.failed(res,[], err.message)
-                })
             })
         } catch (error) {
             response.failed(res,[], `Internal Server Error`)
@@ -81,7 +82,7 @@ const product = {
             upload.single('img')(req,res, (err)=>{
                 if(err){
                     if(err.code === 'LIMIT_FILE_SIZE'){
-                        response.failed(res,[], 'file size is too large')
+                        response.failed(res,[], 'Image size is too big! Please upload another one with size <200kb')
                     }else{
                         response.failed(res,[], err)
                     }
@@ -108,7 +109,7 @@ const product = {
             upload.single('img')(req,res,(err)=>{
                 if(err){
                     if(err.code === 'LIMIT_FILE_SIZE'){
-                        response.failed(res,[], 'file size is too large')
+                        response.failed(res,[], 'Image size is too big! Please upload another one with size <200kb')
                     }else{
                         response.failed(res,[], err)
                     }

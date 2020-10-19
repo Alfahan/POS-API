@@ -122,7 +122,7 @@ const users = {
                                 level: results.level
                             },
                             JWTSecreet,
-                            {expiresIn:5},
+                            {expiresIn:3600},
 
                             (err,token) => {
                                 if(err){
