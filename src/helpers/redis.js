@@ -13,8 +13,9 @@ const pos = {
                 const typesort = !req.query.typesort ? 'ASC': req.query.typesort
                 const by = !req.query.by ? 'idproduct' : req.query.by
                 
-                const limit = !req.query.limit?10:parseInt(req.query.limit)
-                const page = !req.query.page?1:parseInt(req.query.page)
+                const limit = !req.query.limit? 10 : parseInt(req.query.limit)
+                const page = !req.query.page? 1 : parseInt(req.query.page)
+
                 
                 // pagination
                 const starPage = (page-1) * limit
@@ -40,7 +41,7 @@ const pos = {
                         page
                     },
                     // pagination
-                    data: redisData.slice(starPage,endPage)
+                    data: redisData.slice(starPage, endPage)
                 })
             } else{
                 next()
@@ -55,7 +56,7 @@ const pos = {
                 const typesort = !req.query.typesort ? 'ASC': req.query.typesort
                 const by = !req.query.by ? 'idcategory' : req.query.by
                 
-                const limit = !req.query.limit?10:parseInt(req.query.limit)
+                const limit = !req.query.limit?5:parseInt(req.query.limit)
                 const page = !req.query.page?1:parseInt(req.query.page)
                 
                 // pagination
