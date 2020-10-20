@@ -1,8 +1,24 @@
 const historyModel = require('../models/history')
 const response = require('../helpers/response')
-const { success } = require('../helpers/response')
+const { success, failed } = require('../helpers/response')
 
 const history = {
+        getall: (req, res) => {
+            historyModel.getall()
+            .then(result => {
+                success(res, result, `Get all data success`)
+            }).catch(err => {
+                failed(res, [], err)
+            })
+        },
+        getDetail: (req, res) => {
+            historyModel.getDetail()
+            .then(result => {
+                success(res, result, `Get all data success`)
+            }).catch(err => {
+                failed(res, [], err)
+            })
+        },
         insert: async(req,res)=>{
             const body = req.body
             historyModel.insertMaster(body)

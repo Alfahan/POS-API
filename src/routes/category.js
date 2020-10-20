@@ -9,9 +9,9 @@ const router = express.Router()
 router
     .get('/getall', redis.getCategory, categoryController.getAll)
     .get('/getDetail/:idcategory',categoryController.getDetail)
-    .post('/insert', auth.authentication, auth.authorization, auth.authorizationAdmin, categoryController.insert)
-    .put('/update/:idcategory',auth.authentication, auth.authorization, auth.authorizationAdmin, categoryController.update)
-    .patch('/updatePatch/:idcategory',auth.authentication, auth.authorization, auth.authorizationAdmin, categoryController.updatePatch)
-    .delete('/delete/:idcategory',auth.authentication, auth.authorization, auth.authorizationAdmin, categoryController.delete)
+    .post('/insert', auth.authentication, auth.authorization, categoryController.insert)
+    .put('/update/:idcategory',auth.authentication, auth.authorization,  categoryController.update)
+    .patch('/updatePatch/:idcategory',auth.authentication, auth.authorization, categoryController.updatePatch)
+    .delete('/delete/:idcategory',auth.authentication, auth.authorization,  categoryController.delete)
 
 module.exports = router

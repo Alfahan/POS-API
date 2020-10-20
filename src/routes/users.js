@@ -21,7 +21,7 @@ router
 
 
    // Get All User
-   .get('/getall',auth.authentication, auth.authorization,usersController.getall)
+   .get('/getall',auth.authentication, auth.authorization, usersController.getall)
    
    // Get Detail User
    .get('/getdetail/:iduser',auth.authentication, auth.authorization,usersController.getDetail)
@@ -30,6 +30,6 @@ router
    .put('/update/:iduser',auth.authentication, auth.authorization,usersController.update)
    
    // Delete User
-   .delete('/delete/:iduser',auth.authentication, auth.authorization, auth.authorizationAdmin, usersController.delete)
+   .delete('/delete/:iduser',auth.authentication, auth.authorization, usersController.delete)
 
 module.exports = router
